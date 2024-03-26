@@ -1,20 +1,22 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/controller/new_todolist_controller.dart';
 import 'package:flutter_todo/controller/priority_controller.dart';
 import 'package:flutter_todo/controller/time_controller.dart';
-import 'package:flutter_todo/model/list_task_list.dart';
 import 'package:flutter_todo/model/task.dart';
 import 'package:get/get.dart';
 
 class TaskView extends StatelessWidget {
-  const TaskView({super.key});
+  TaskView({super.key});
+
+  final TimeController timeController = Get.find();
+
+  final PriorityController priorityController = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    final data = Get.arguments;
-    ListTaskList title =
-        data[0] ?? ListTaskList(listName: "list", taskList: []);
-    int listNo = data[1];
+    
     List<String> times = [
       " ",
       "+",
@@ -52,11 +54,6 @@ class TaskView extends StatelessWidget {
       "23.5"
     ];
 
-    //Task hTask = title.taskList[0];
-    final TimeController timeController = Get.find();
-
-    final PriorityController priorityController = Get.find();
-
     return GetBuilder<NewTodoListController>(builder: (controller) {
       return Scaffold(
           backgroundColor: Colors.blueGrey[50],
@@ -82,16 +79,15 @@ class TaskView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "${title.listName}",
+                            "${controller.title.value.listName}",
                             style: const TextStyle(
                                 color: Colors.black,
-                                //fontFamily: "MonaSans",
                                 fontWeight: FontWeight.w900,
                                 fontSize: 26),
                           ),
                           GestureDetector(
                             onTap: () {
-                              controller.taskTitle.value.text = "Drink Water";
+                              controller.taskTitle.value.text = " ";
                               timeController.startTime.value = "";
                               timeController.endTime.value = "";
                               showDialog(
@@ -107,12 +103,12 @@ class TaskView extends StatelessWidget {
                                         content: Column(
                                           children: [
                                             TextField(
-                                              controller:controller.taskTitle.value ,
+                                              controller:
+                                                  controller.taskTitle.value,
                                               decoration: const InputDecoration(
                                                 label: Text("Task"),
                                                 border: OutlineInputBorder(),
                                               ),
-                                              
                                             ),
                                             const SizedBox(
                                               height: 10,
@@ -140,9 +136,7 @@ class TaskView extends StatelessWidget {
                                                             .startTime.value),
                                               ),
                                             ),
-                                            const SizedBox(
-                                              height: 10
-                                            ),
+                                            const SizedBox(height: 10),
                                             Obx(
                                               () => TextField(
                                                 decoration: InputDecoration(
@@ -247,14 +241,15 @@ class TaskView extends StatelessWidget {
                                             onPressed: () {
                                               controller.addTask(
                                                 Task(
-                                                    taskName: controller.taskTitle.value.text,
+                                                    taskName: controller
+                                                        .taskTitle.value.text,
                                                     startTime: timeController
                                                         .startTime.value,
                                                     endTime: timeController
                                                         .endTime.value,
                                                     priority: priorityController
                                                         .priority.value),
-                                                listNo,
+                                                controller.listNo.value,
                                               );
                                               timeController.startTime.value =
                                                   " ";
@@ -298,33 +293,27 @@ class TaskView extends StatelessWidget {
                                   return InkWell(
                                     onTap: () {
                                       timeController.selectRange(times[index]);
-                                      // timeController.range.value =
-                                      //     times.sublist(
-                                      //         times.indexOf(timeController
-                                      //                 .time1.value) +
-                                      //             1,
-                                      //         times.indexOf(
-                                      //             timeController.time2.value));
-                                      // // if(timeController.time1.value != 'x' && timeController.time2.value != 'x'  ){
-                                      // timeController.range.value =
-                                      //     times.sublist(
-                                      //         times.indexOf(timeController
-                                      //                 .time1.value) +
-                                      //             1,
-                                      //         times.indexOf(
-                                      //             timeController.time2.value));
-                                      // }
-                                      //print(times[index]);
+                                      if (timeController.time1.value != "x" &&
+                                          timeController.time2.value != "x") {
+                                        timeController.range!.value =
+                                            times
+                                                .sublist(
+                                                    times.indexOf(timeController
+                                                            .time1.value) +
+                                                        1,
+                                                    times.indexOf(timeController
+                                                        .time2.value));
+                                      }
                                     },
                                     child: Obx(
                                       () => Container(
                                         margin: EdgeInsets.symmetric(
-                                            vertical: timeController.range
+                                            vertical: timeController.range!
                                                     .contains(times[index])
                                                 ? 5
                                                 : 0),
                                         decoration: BoxDecoration(
-                                            color: timeController.range
+                                            color: timeController.range!
                                                     .contains(times[index])
                                                 ? const Color(0xFF5460EA)
                                                 : null,
@@ -357,7 +346,7 @@ class TaskView extends StatelessWidget {
                                                   ? ".5"
                                                   : times[index],
                                               style: TextStyle(
-                                                  color: timeController.range
+                                                  color: timeController.range!
                                                           .contains(
                                                               times[index])
                                                       ? Colors.white
@@ -380,29 +369,32 @@ class TaskView extends StatelessWidget {
                                   );
                                 }),
                           ),
-                          //timeController.getCard(title)?
-                          true
-                              ? Expanded(
-                                  child: Container(
-                                  margin: const EdgeInsets.all(15),
-                                  height: 110,
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: Colors.white),
-                                  child: Column(
-                                    children: [Text("hi")],
-                                  ),
-                                ))
-                              : const Text(
-                                  "Select a time range to find your tasks")
+                          timeController.cardTask(controller.title.value)
+                              ? Obx(
+                                  () => Expanded(
+                                      child: Container(
+                                    margin: const EdgeInsets.all(15),
+                                    height: 110,
+                                    width: MediaQuery.of(context).size.width,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.white),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                            "${timeController.hTask.value.startTime} - ${timeController.hTask.value.endTime}")
+                                      ],
+                                    ),
+                                  )),
+                                )
+                              : const Text("Select Time")
                         ],
                       ),
                     ),
                     SliverList.builder(
-                        itemCount: title.taskList.length,
+                        itemCount: controller.title.value.taskList.length,
                         itemBuilder: ((context, index) {
-                          Task task = title.taskList[index];
+                          Task task = controller.title.value.taskList[index];
 
                           return Padding(
                             padding:
@@ -426,7 +418,7 @@ class TaskView extends StatelessWidget {
                                                   onPressed: () {
                                                     controller.deleteTask(
                                                         Task(id: task.id),
-                                                        listNo);
+                                                        controller.listNo.value);
                                                     Navigator.pop(context);
                                                   },
                                                   child: const Text("Delete"))
@@ -520,13 +512,13 @@ class TaskView extends StatelessWidget {
                                                         color: task.isDone ==
                                                                 true
                                                             ? Colors.grey[400]
-                                                            : title
-                                                                        .taskList[
+                                                            : controller.title
+                                                                        .value.taskList[
                                                                             index]
                                                                         .priority ==
                                                                     "High"
                                                                 ? Colors.red
-                                                                : title.taskList[index].priority ==
+                                                                : controller.title.value.taskList[index].priority ==
                                                                         "Regular"
                                                                     ? Colors
                                                                         .amber
@@ -605,7 +597,7 @@ class TaskView extends StatelessWidget {
                   child: IconButton(
                     onPressed: () {
                       //Get.back();
-                      if (controller.lists[listNo].taskList.isNotEmpty) {
+                      if (controller.fc.lists[controller.listNo.value].taskList.isNotEmpty) {
                         showDialog(
                             context: context,
                             builder: ((context) {
@@ -614,7 +606,7 @@ class TaskView extends StatelessWidget {
                                 actions: [
                                   TextButton(
                                       onPressed: () {
-                                        controller.clearList(listNo);
+                                        controller.clearList(controller.listNo.value);
                                         Navigator.of(context).pop();
                                       },
                                       child: const Text("Conform"))

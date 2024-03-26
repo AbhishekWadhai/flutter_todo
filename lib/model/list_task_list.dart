@@ -1,9 +1,13 @@
-
 import 'package:flutter_todo/model/task.dart';
 
 class ListTaskList {
   String? listName;
   List<Task> taskList = <Task>[];
+
+  factory ListTaskList.empty() => ListTaskList(
+        listName: "",
+        taskList: [],
+      );
 
   ListTaskList({this.listName, required this.taskList});
 
@@ -21,9 +25,9 @@ class ListTaskList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['listName'] = this.listName;
-    data['taskList'] = this.taskList.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['listName'] = listName;
+    data['taskList'] = taskList.map((v) => v.toJson()).toList();
     return data;
   }
 }

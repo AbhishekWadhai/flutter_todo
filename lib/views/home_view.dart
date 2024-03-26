@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/controller/new_todolist_controller.dart';
+import 'package:flutter_todo/controller/first_controller.dart';
 import 'package:flutter_todo/model/list_task_list.dart';
 import 'package:flutter_todo/model/task.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class HomeView extends StatelessWidget {
-  //const HomeView({super.key});
-
+  HomeView({super.key});
+  //final NewTodoListController controller = Get.find();
   @override
   Widget build(BuildContext context) {
-    //final NewTodoListController controller = Get.find();
-
-    return GetBuilder<NewTodoListController>(builder: (controller) {
+    return GetBuilder<FirstController>(builder: (controller) {
       return Scaffold(
           body: Padding(
         padding: const EdgeInsets.all(8.0),
