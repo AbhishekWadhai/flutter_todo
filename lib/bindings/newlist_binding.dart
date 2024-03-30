@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 class NewlistBinding extends Bindings{
   @override
   void dependencies() {
-    Get.lazyPut(() => NewTodoListController());
+    Get.put( NewTodoListController());
   }
 
 }

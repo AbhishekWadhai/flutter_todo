@@ -3,6 +3,6 @@ import 'package:get/get.dart';
 class PickTimeBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => TimeController());
+    Get.put( TimeController());
   }
 }

@@ -3,6 +3,6 @@ import 'package:get/get.dart';
 class PriorityBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => PriorityController());
+    Get.put( PriorityController());
   }
 }
