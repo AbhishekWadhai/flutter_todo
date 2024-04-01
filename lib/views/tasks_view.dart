@@ -18,7 +18,6 @@ class TaskView extends StatelessWidget {
       return Scaffold(
         endDrawer: SafeArea(
           child: Drawer(
-            
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
               child: Column(
@@ -156,8 +155,8 @@ class TaskView extends StatelessWidget {
                               controller.listNo.value,
                             );
                             controller.taskTitle.value.text = " ";
-                            timeController.startTime.value = " ";
-                            timeController.endTime.value = " ";
+                            timeController.startTime.value = "00:00 ";
+                            timeController.endTime.value = "00:00 ";
                             priorityController.priority.value = "Regular";
                             Navigator.pop(context);
                           },
@@ -198,6 +197,18 @@ class TaskView extends StatelessWidget {
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar(
+                    actions: [
+                      Builder(
+                        builder: (context) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: IconButton(onPressed: (){
+                              Scaffold.of(context).openEndDrawer();
+                            }, icon: const Icon(Icons.playlist_add, size: 38,)),
+                          );
+                        }
+                      )
+                    ],
                     automaticallyImplyLeading: false,
                     titleSpacing: 0,
                     stretch: false,

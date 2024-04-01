@@ -34,19 +34,19 @@ class InsightsController extends GetxController {
       int s = int.parse(start);
       int e = int.parse(end);
       title.value.taskList[i].duration = e - s;
-      if (s >= 0 && e < 6) {
+      if (s >= 0 && s < 6) {
         for (int j = 0; j < title.value.taskList[i].duration! * 2; j++) {
           q1.add(title.value.taskList[i]);
         }
-      } else if (s >= 6 && e < 12) {
+      } else if (s >= 6 && s < 12) {
         for (int j = 0; j < title.value.taskList[i].duration! * 2; j++) {
           q2.add(title.value.taskList[i]);
         }
-      } else if (s >= 12 && e < 18) {
+      } else if (s >= 12 && s < 18) {
         for (int j = 0; j < title.value.taskList[i].duration! * 2; j++) {
           q3.add(title.value.taskList[i]);
         }
-      } else if (s >= 18 && e <= 23) {
+      } else if (s >= 18 && s <= 23) {
         for (int j = 0; j < title.value.taskList[i].duration! * 2; j++) {
           q4.add(title.value.taskList[i]);
         }

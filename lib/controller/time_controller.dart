@@ -9,8 +9,9 @@ import 'package:get/get.dart';
 // import 'package:get/get.dart';
 
 class TimeController extends GetxController {
-  RxString startTime = 'now'.obs;
-  RxString endTime = ' '.obs;
+  
+  RxString startTime = '00:00'.obs;
+  RxString endTime = '00:00'.obs;
   RxList<String>? range = <String>[].obs;
   RxString time1 = 'x'.obs;
   RxString time2 = 'x'.obs;

@@ -25,7 +25,7 @@ class ListTaskList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['listName'] = listName;
     data['taskList'] = taskList.map((v) => v.toJson()).toList();
     return data;

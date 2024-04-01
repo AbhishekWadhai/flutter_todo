@@ -157,6 +157,7 @@ class TimeRange extends StatelessWidget {
           GetBuilder<TimeController>(builder: (timeController) {
             return timeController.cardTask(controller.title.value)
                 ? Card(
+                  color: Colors.grey[100],
                     margin: const EdgeInsets.all(10),
                     elevation: 3,
                     shape: RoundedRectangleBorder(
@@ -293,6 +294,7 @@ class TimeRange extends StatelessWidget {
                     ),
                   )
                 : Card(
+                  color: Colors.grey[50],
                     margin: const EdgeInsets.all(10),
                     elevation: 3,
                     shape: RoundedRectangleBorder(
@@ -302,7 +304,7 @@ class TimeRange extends StatelessWidget {
                       padding: EdgeInsets.only(left: 25, top: 15),
                       child: SizedBox(
                         height: 140,
-                        child: Center(
+                        child:  Center(
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

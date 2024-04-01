@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_todo/controller/first_controller.dart';
 import 'package:flutter_todo/model/list_task_list.dart';
 import 'package:flutter_todo/model/task.dart';
 import 'package:get/get.dart';
@@ -10,13 +9,15 @@ class NewTodoListController extends GetxController {
   Rx<TextEditingController> taskTitle = TextEditingController().obs;
   Rx<ListTaskList> title = ListTaskList.empty().obs;
   Rx<int> listNo = 0.obs;
-  FirstController fc = FirstController();
+
   @override
   onInit() {
     super.onInit();
     final data = Get.arguments;
     title.value = data[0] ?? ListTaskList.empty();
-    listNo.value = data[1] ?? 0;
+    listNo.value = data[1];
+
+    print(listNo);
   }
 
   isSelected(int index) {
@@ -38,20 +39,17 @@ class NewTodoListController extends GetxController {
     int taskId = title.value.taskList.length + 1;
     newTask.id = taskId;
     title.value.taskList.add(newTask);
-
     update();
-    fc.savetoStorage();
+    ;
   }
 
   deleteTask(Task newTask, int index) {
     title.value.taskList.removeWhere((element) => element.id == newTask.id);
     update();
-    fc.savetoStorage();
   }
 
   toggleCheckbox(Task task) {
     task.isDone = !task.isDone!;
     update();
-    fc.savetoStorage();
   }
 }

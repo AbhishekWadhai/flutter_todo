@@ -4,6 +4,6 @@ import 'package:get/get.dart';
 class FirstBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put( FirstController());
+    Get.put(FirstController());
   }
 }
