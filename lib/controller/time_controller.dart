@@ -3,22 +3,14 @@ import 'package:flutter_todo/model/list_task_list.dart';
 import 'package:flutter_todo/model/task.dart';
 import 'package:get/get.dart';
 
-// import 'package:flutter/material.dart';
-// import 'package:flutter_todo/model/list_task_list.dart';
-// import 'package:flutter_todo/model/task.dart';
-// import 'package:get/get.dart';
-
 class TimeController extends GetxController {
-  
   RxString startTime = '00:00'.obs;
   RxString endTime = '00:00'.obs;
-  RxList<String>? range = <String>[].obs;
+  RxList<String> range = <String>[].obs;
   RxString time1 = 'x'.obs;
   RxString time2 = 'x'.obs;
-  RxList<String> timeS = <String>[].obs;
   int f = 0;
   Rx<Task> hTask = Task().obs;
-  RxBool contain  = false.obs;
   List<String> times = [
     " ",
     "+",
@@ -57,25 +49,37 @@ class TimeController extends GetxController {
     "+"
   ];
 
-  selectRange(String time, ListTaskList lists) {
+  selectRange(int index, String time, ListTaskList lists) {
     if (time1.value == "x") {
       time1.value = time;
-      ++f;
-    } else if (time2.value != time) {
+      update();
+      f=1;
+    } else if (index < times.indexOf(time1.value)) {
+      time1.value = time;
+      time2.value = "x";
+      range.clear();
+      update();
+    } else if (time2.value != time && time2.value == "x") {
       time2.value = time;
       update();
-      ++f;
+      f=2;
     }
-    if (f == 2) {
+    else{
+      ++f;
       time1.value = time;
-      range!.clear();
+      time2.value = "x";
+      range.clear();
+
+    }
+    if (f == 3) {
+      time1.value = time;
+      range.clear();
       time2.value = "x";
       f = 0;
     }
     if (time1.value != "x" && time2.value != "x") {
-      range!.value = times.sublist(
+      range.value = times.sublist(
           times.indexOf(time1.value), times.indexOf(time2.value) + 1);
-
       cardTask(lists);
     }
   }
@@ -114,10 +118,10 @@ class TimeController extends GetxController {
 
   cardTask(ListTaskList lists) {
     for (int i = 0; i < lists.taskList.length; i++) {
-      for (String r in range!) {
+      for (String r in range) {
         String sub = r.substring(0, 2);
-        if (sub == (lists.taskList[i].startTime!.substring(0, 2)) &&
-            lists.taskList[i].isDone == false ) {
+        if (sub == (lists.taskList[i].startTime?.substring(0, 2)) &&
+            lists.taskList[i].isDone == false) {
           hTask.value = lists.taskList[i];
           update();
           return true;
@@ -127,5 +131,4 @@ class TimeController extends GetxController {
     update();
     return false;
   }
-  
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/routes/routes.dart';
+import 'package:flutter_todo/services/storage_service.dart';
 import 'package:get/route_manager.dart';
-import 'package:get_storage/get_storage.dart';
 
 void main() async {
-  await GetStorage.init();
+  WidgetsFlutterBinding.ensureInitialized();
+  await StoragePreferences.init();
   runApp(const MyApp());
 }
 

@@ -6,9 +6,7 @@ import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 
 class HomeView extends StatelessWidget {
-  const HomeView({super.key});
-  //final NewTodoListController controller = Get.find();
-  @override
+  const HomeView({super.key});@override
   Widget build(BuildContext context) {
     return Scaffold(body: GetBuilder<FirstController>(
       builder: (controller) {
@@ -21,8 +19,16 @@ class HomeView extends StatelessWidget {
                 Expanded(
                     child: Visibility(
                   visible: controller.lists.isNotEmpty,
-                  replacement: const Center(
-                      child: Text("No available lists, You can start an new day!", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),),
+                  replacement: const Padding(
+                    padding:  EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Text(
+                        "No available lists, You can start an new day!",
+                        style:
+                            TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
                   child: GridView.builder(
                       itemCount: controller.lists.length,
                       gridDelegate:
@@ -34,7 +40,7 @@ class HomeView extends StatelessWidget {
                         return InkWell(
                           onTap: () {
                             Get.toNamed("/taskView",
-                                arguments: [controller.lists[index], index]);
+                                arguments: [ controller.lists , controller.lists[index], index]);
                           },
                           onLongPress: () {
                             showDialog(
@@ -116,7 +122,7 @@ class HomeView extends StatelessWidget {
                                                               ? TextDecoration
                                                                   .lineThrough
                                                               : null),
-                                                  //overflow: TextOverflow.ellipsis,
+                                                  overflow: TextOverflow.ellipsis,
                                                   maxLines: 1,
                                                 ),
                                               ],
@@ -153,17 +159,22 @@ class HomeView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(40)),
                   child: TextButton(
                     onPressed: () {
+                      Get.defaultDialog();
                       showDatePicker(
                               context: context,
                               initialDate: DateTime.now(),
-                              firstDate: DateTime.now(),
+                              firstDate: DateTime(2024),
                               lastDate: DateTime(2025))
                           .then((value) {
                         var date = Jiffy.parseFromDateTime(value!)
                             .format(pattern: "MMM  do");
 
-                        controller.addList(
-                            ListTaskList(listName: date, taskList: <Task>[]));
+                        if (controller.lists.any((element) => element.listName == date)) {
+                          ScaffoldMessenger.of(context).showSnackBar( const SnackBar(backgroundColor: Colors.green, content: Text("List for the day already exists")));
+                        }else{
+                          controller.addList(
+                              ListTaskList(listName: date, taskList: <Task>[]));
+                        }
                       });
                     },
                     style: ButtonStyle(

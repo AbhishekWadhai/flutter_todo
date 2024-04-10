@@ -22,7 +22,7 @@ class Task {
     duration = json["duration"];
     taskName = json["taskName"];
     startTime = json["startTime"];
-    startTime = json["endTime"];
+    endTime = json["endTime"];
     priority = json["priority"];
   }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_todo/model/list_task_list.dart';
 import 'package:flutter_todo/model/task.dart';
+import 'package:flutter_todo/services/storage_service.dart';
 import 'package:get/get.dart';
 
 class NewTodoListController extends GetxController {
+  List<ListTaskList> lists = <ListTaskList>[];
   RxBool active = false.obs;
   RxInt selected = RxInt(-1);
   Rx<TextEditingController> taskTitle = TextEditingController().obs;
@@ -14,9 +16,9 @@ class NewTodoListController extends GetxController {
   onInit() {
     super.onInit();
     final data = Get.arguments;
-    title.value = data[0] ?? ListTaskList.empty();
-    listNo.value = data[1];
-
+    lists = data[0];
+    title.value = data[1] ?? ListTaskList.empty();
+    listNo.value = data[2] ?? 0;
     print(listNo);
   }
 
@@ -30,26 +32,39 @@ class NewTodoListController extends GetxController {
     }
   }
 
-  clearList(int index) {
-    title.value.taskList.clear();
-    update();
-  }
-
-  addTask(Task newTask, int index) {
-    int taskId = title.value.taskList.length + 1;
+  addTask(Task newTask, int index) async{
+    int taskId = lists[index].taskList.length + 1;
     newTask.id = taskId;
-    title.value.taskList.add(newTask);
+    await saveTask(newTask);
     update();
-    ;
+    //title.value.taskList.add(newTask);
   }
 
   deleteTask(Task newTask, int index) {
+    lists[listNo.value]
+        .taskList
+        .removeWhere((element) => element.id == newTask.id);
     title.value.taskList.removeWhere((element) => element.id == newTask.id);
+    active.value = false;
     update();
+    StoragePreferences.setListTaskLists(lists);
   }
 
   toggleCheckbox(Task task) {
     task.isDone = !task.isDone!;
     update();
+    StoragePreferences.setListTaskLists(lists);
+  }
+
+  clearList() {
+    title.value.taskList.clear();
+    lists[listNo.value].taskList.clear();
+    update();
+    StoragePreferences.setListTaskLists(lists);
+  }
+
+  saveTask(Task newTask) async {
+    lists[listNo.value].taskList.add(newTask);
+    StoragePreferences.setListTaskLists(lists);
   }
 }

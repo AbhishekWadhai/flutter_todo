@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo/controller/first_controller.dart';
 import 'package:flutter_todo/controller/new_todolist_controller.dart';
 import 'package:flutter_todo/controller/priority_controller.dart';
 import 'package:flutter_todo/controller/time_controller.dart';
@@ -11,6 +12,8 @@ class TaskView extends StatelessWidget {
   final TimeController timeController = Get.find();
 
   final PriorityController priorityController = Get.find();
+
+  final FirstController firstController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +37,7 @@ class TaskView extends StatelessWidget {
                       const SizedBox(
                         height: 20,
                       ),
-                      TextField(
+                      TextFormField(
                         controller: controller.taskTitle.value,
                         decoration: const InputDecoration(
                           label: Text("Task"),
@@ -45,7 +48,7 @@ class TaskView extends StatelessWidget {
                         height: 10,
                       ),
                       Obx(
-                        () => TextField(
+                        () => TextFormField(
                           decoration: InputDecoration(
                               label: const Text("Start Time"),
                               border: const OutlineInputBorder(),
@@ -62,16 +65,15 @@ class TaskView extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Obx(
-                        () => TextField(
+                        () => TextFormField(
                           decoration: InputDecoration(
                               label: const Text("End Time"),
                               border: const OutlineInputBorder(),
                               suffixIcon: IconButton(
-                                icon: const Icon(Icons.watch_later_outlined),
-                                onPressed: () {
-                                  timeController.selectEndTime(context);
-                                },
-                              )),
+                                  icon: const Icon(Icons.watch_later_outlined),
+                                  onPressed: () {
+                                    timeController.selectEndTime(context);
+                                  })),
                           readOnly: true,
                           controller: TextEditingController(
                               text: timeController.endTime.value),
@@ -146,14 +148,30 @@ class TaskView extends StatelessWidget {
                             borderRadius: BorderRadius.circular(40)),
                         child: TextButton(
                           onPressed: () {
-                            controller.addTask(
-                              Task(
-                                  taskName: controller.taskTitle.value.text,
-                                  startTime: timeController.startTime.value,
-                                  endTime: timeController.endTime.value,
-                                  priority: priorityController.priority.value),
-                              controller.listNo.value,
-                            );
+                            int startTime = int.parse(
+                                timeController.startTime.value.split(":")[0]);
+                            int endTime = int.parse(
+                                timeController.endTime.value.split(":")[0]);
+
+                            if (endTime >= startTime) {
+                              controller.addTask(
+                                Task(
+                                    taskName: controller.taskTitle.value.text,
+                                    startTime: timeController.startTime.value,
+                                    endTime: timeController.endTime.value,
+                                    priority:
+                                        priorityController.priority.value),
+                                controller.listNo.value,
+                              );
+                              firstController.loadData();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      backgroundColor: Colors.red,
+                                      content: Text(
+                                          "End time should be Greater than Start time")));
+                            }
+
                             controller.taskTitle.value.text = " ";
                             timeController.startTime.value = "00:00 ";
                             timeController.endTime.value = "00:00 ";
@@ -182,7 +200,9 @@ class TaskView extends StatelessWidget {
                     ),
                     trailing: const Icon(Icons.bar_chart_outlined),
                     onTap: () {
-                      Get.toNamed("/insight", arguments: controller.title);
+                      Navigator.pop(context);
+                      Get.toNamed("/insight",
+                          arguments: [controller.lists[controller.listNo.value], controller.lists]);
                     },
                   )
                 ],
@@ -198,16 +218,19 @@ class TaskView extends StatelessWidget {
                 slivers: [
                   SliverAppBar(
                     actions: [
-                      Builder(
-                        builder: (context) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: IconButton(onPressed: (){
-                              Scaffold.of(context).openEndDrawer();
-                            }, icon: const Icon(Icons.playlist_add, size: 38,)),
-                          );
-                        }
-                      )
+                      Builder(builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: IconButton(
+                              onPressed: () {
+                                Scaffold.of(context).openEndDrawer();
+                              },
+                              icon: const Icon(
+                                Icons.playlist_add,
+                                size: 38,
+                              )),
+                        );
+                      })
                     ],
                     automaticallyImplyLeading: false,
                     titleSpacing: 0,
@@ -227,7 +250,7 @@ class TaskView extends StatelessWidget {
                           width: 5,
                         )),
                     title: Text(
-                      "${controller.title.value.listName}",
+                      "${controller.lists[controller.listNo.value].listName}",
                       style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w900,
@@ -235,9 +258,12 @@ class TaskView extends StatelessWidget {
                     ),
                   ),
                   SliverList.builder(
-                      itemCount: controller.title.value.taskList.length,
+                      itemCount: controller.lists[controller.listNo.value].taskList.length,
                       itemBuilder: ((context, index) {
-                        Task task = controller.title.value.taskList[index];
+                        firstController.getdata();
+                        Task task = controller.lists[controller.listNo.value].taskList[index];
+                        
+                        // Task task = controller.title.value.taskList[index];
 
                         return Padding(
                           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -259,6 +285,7 @@ class TaskView extends StatelessWidget {
                                                       Task(id: task.id),
                                                       controller.listNo.value);
                                                   Navigator.pop(context);
+                                                  firstController.loadData();
                                                 },
                                                 child: const Text("Delete"))
                                           ],
@@ -268,7 +295,6 @@ class TaskView extends StatelessWidget {
                                 () => Padding(
                                   padding: const EdgeInsets.all(2.0),
                                   child: Card(
-                                    //margin: EdgeInsets.zero,
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(10.0),
@@ -281,7 +307,6 @@ class TaskView extends StatelessWidget {
                                                 : Colors.transparent,
                                             width: 2.0)),
                                     color: Colors.white,
-
                                     child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -325,7 +350,6 @@ class TaskView extends StatelessWidget {
                                                         "${task.startTime ?? " "} - ${task.endTime ?? " "}",
                                                         style: TextStyle(
                                                           fontSize: 15,
-                                                          //fontFamily: "Mona",
                                                           color: task.isDone ==
                                                                   true
                                                               ? Colors.grey[400]
@@ -335,7 +359,6 @@ class TaskView extends StatelessWidget {
                                                 ],
                                               ),
                                               Row(
-                                                //crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   const SizedBox(
                                                     width: 5,
@@ -409,6 +432,7 @@ class TaskView extends StatelessWidget {
                                               value: task.isDone,
                                               onChanged: (value) {
                                                 controller.toggleCheckbox(task);
+                                                firstController.loadData();
                                               }),
                                         ),
                                       ],
@@ -441,11 +465,11 @@ class TaskView extends StatelessWidget {
                               actions: [
                                 TextButton(
                                     onPressed: () {
-                                      controller
-                                          .clearList(controller.listNo.value);
+                                      controller.clearList();
+                                      firstController.loadData();
                                       Navigator.of(context).pop();
                                     },
-                                    child: const Text("Conform"))
+                                    child: const Text("Confirm"))
                               ],
                             );
                           }));
@@ -468,190 +492,3 @@ class TaskView extends StatelessWidget {
     });
   }
 }
-
-
-
-// controller.taskTitle.value.text = " ";
-//                                 timeController.startTime.value = "";
-//                                 timeController.endTime.value = "";
-//                                 showDialog(
-//                                     context: context,
-//                                     builder: (context) => AlertDialog(
-//                                           scrollable: true,
-//                                           backgroundColor: Colors.grey[100],
-//                                           title: const Text(
-//                                             "Add Task",
-//                                             style: TextStyle(
-//                                                 color: Color(0xFF5460EA)),
-//                                           ),
-//                                           content: Column(
-//                                             children: [
-//                                               TextField(
-//                                                 controller:
-//                                                     controller.taskTitle.value,
-//                                                 decoration:
-//                                                     const InputDecoration(
-//                                                   label: Text("Task"),
-//                                                   border: OutlineInputBorder(),
-//                                                 ),
-//                                               ),
-//                                               const SizedBox(
-//                                                 height: 10,
-//                                               ),
-//                                               Obx(
-//                                                 () => TextField(
-//                                                   decoration: InputDecoration(
-//                                                       label: const Text(
-//                                                           "Start Time"),
-//                                                       border:
-//                                                           const OutlineInputBorder(),
-//                                                       suffixIcon: IconButton(
-//                                                         icon: const Icon(Icons
-//                                                             .watch_later_outlined),
-//                                                         onPressed: () {
-//                                                           timeController
-//                                                               .selectStartTime(
-//                                                                   context);
-//                                                         },
-//                                                       )),
-//                                                   readOnly: true,
-//                                                   controller:
-//                                                       TextEditingController(
-//                                                           text: timeController
-//                                                               .startTime.value),
-//                                                 ),
-//                                               ),
-//                                               const SizedBox(height: 10),
-//                                               Obx(
-//                                                 () => TextField(
-//                                                   decoration: InputDecoration(
-//                                                       label: const Text(
-//                                                           "End Time"),
-//                                                       border:
-//                                                           const OutlineInputBorder(),
-//                                                       suffixIcon: IconButton(
-//                                                         icon: const Icon(Icons
-//                                                             .watch_later_outlined),
-//                                                         onPressed: () {
-//                                                           timeController
-//                                                               .selectEndTime(
-//                                                                   context);
-//                                                         },
-//                                                       )),
-//                                                   readOnly: true,
-//                                                   controller:
-//                                                       TextEditingController(
-//                                                           text: timeController
-//                                                               .endTime.value),
-//                                                 ),
-//                                               ),
-//                                               const SizedBox(
-//                                                 height: 10,
-//                                               ),
-//                                               const Text(
-//                                                 "Priority",
-//                                                 style: (TextStyle(
-//                                                     fontWeight:
-//                                                         FontWeight.w600)),
-//                                               ),
-//                                               Row(
-//                                                 mainAxisAlignment:
-//                                                     MainAxisAlignment
-//                                                         .spaceEvenly,
-//                                                 children: [
-//                                                   Column(
-//                                                     children: [
-//                                                       Obx(
-//                                                         () => Radio(
-//                                                             activeColor:
-//                                                                 Colors.red,
-//                                                             value: "High",
-//                                                             groupValue:
-//                                                                 priorityController
-//                                                                     .priority
-//                                                                     .value,
-//                                                             onChanged: (value) {
-//                                                               priorityController
-//                                                                   .setPriority(value
-//                                                                       .toString());
-//                                                             }),
-//                                                       ),
-//                                                       const Text("High")
-//                                                     ],
-//                                                   ),
-//                                                   Column(
-//                                                     children: [
-//                                                       Obx(
-//                                                         () => Radio(
-//                                                             activeColor:
-//                                                                 Colors.amber,
-//                                                             value: "Regular",
-//                                                             groupValue:
-//                                                                 priorityController
-//                                                                     .priority
-//                                                                     .value,
-//                                                             onChanged: (value) {
-//                                                               priorityController
-//                                                                   .setPriority(value
-//                                                                       .toString());
-//                                                             }),
-//                                                       ),
-//                                                       const Text("Regular")
-//                                                     ],
-//                                                   ),
-//                                                   Column(
-//                                                     children: [
-//                                                       Obx(
-//                                                         () => Radio(
-//                                                             activeColor:
-//                                                                 Colors.green,
-//                                                             value: "Low",
-//                                                             groupValue:
-//                                                                 priorityController
-//                                                                     .priority
-//                                                                     .value,
-//                                                             onChanged: (value) {
-//                                                               priorityController
-//                                                                   .setPriority(value
-//                                                                       .toString());
-//                                                             }),
-//                                                       ),
-//                                                       const Text("Low")
-//                                                     ],
-//                                                   ),
-//                                                 ],
-//                                               )
-//                                             ],
-//                                           ),
-//                                           actions: [
-//                                             TextButton(
-//                                               onPressed: () {
-//                                                 controller.addTask(
-//                                                   Task(
-//                                                       taskName: controller
-//                                                           .taskTitle.value.text,
-//                                                       startTime: timeController
-//                                                           .startTime.value,
-//                                                       endTime: timeController
-//                                                           .endTime.value,
-//                                                       priority:
-//                                                           priorityController
-//                                                               .priority.value),
-//                                                   controller.listNo.value,
-//                                                 );
-//                                                 timeController.startTime.value =
-//                                                     " ";
-//                                                 timeController.endTime.value =
-//                                                     " ";
-//                                                 priorityController
-//                                                     .priority.value = "Regular";
-//                                                 Navigator.pop(context);
-//                                               },
-//                                               child: const Text(
-//                                                 "Add",
-//                                                 style: TextStyle(
-//                                                     color: Color(0xFF023E8A)),
-//                                               ),
-//                                             )
-//                                           ],
-//                                         ));
