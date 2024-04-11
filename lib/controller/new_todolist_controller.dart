@@ -33,8 +33,9 @@ class NewTodoListController extends GetxController {
   }
 
   addTask(Task newTask, int index) async{
-    int taskId = lists[index].taskList.length + 1;
-    newTask.id = taskId;
+    //lists.where((element) => element.listName == title.value.listName).forEach((element) => element.taskList.add(newTask)); 
+    // int taskId = lists[index].taskList.length + 1;
+    // newTask.id = taskId;
     await saveTask(newTask);
     update();
     //title.value.taskList.add(newTask);
